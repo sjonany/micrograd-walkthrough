@@ -24,4 +24,4 @@ class Value:
         )
 
     def __repr__(self):
-        return f"{self.label} : {self.data}"
+        return f"{self.label} | data: {self.data:.4f}"
