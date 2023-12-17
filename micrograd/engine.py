@@ -15,7 +15,7 @@ class Value:
 
     def __mul__(self, other):
         c1 = self
-        c2 = other
+        c2 = self.__ensure_value(other)
         out = Value(
             c1.data * c2.data,
             f"({c1.label} * {c2.label})",
@@ -29,7 +29,7 @@ class Value:
 
     def __add__(self, other):
         c1 = self
-        c2 = other
+        c2 = self.__ensure_value(other)
         out = Value(
             c1.data + c2.data,
             f"({c1.label} + {c2.label})",
@@ -40,7 +40,13 @@ class Value:
             c2.grad += out.grad * 1
         out.backward = backward
         return out
+    
+    def __rmul__(self, other):
+        return self * other
 
+    def __radd__(self, other):
+        return self + other
+    
     def tanh(self):
         e2x = np.exp(2 * self.data)
         out = Value(
@@ -53,6 +59,38 @@ class Value:
             self.grad += out.grad * (1 - out.data ** 2)
         out.backward = backward
         return out
+
+    def exp(self):
+        out = Value(
+            np.exp(self.data),
+            f"e^({self.label})",
+            children=(self,),
+        )
+        def backward():
+            self.grad += out.grad * out.data
+        out.backward = backward
+        return out
+
+    def __truediv__(self, other):
+        return self * other**-1
+
+    def __pow__(self, other):
+        assert isinstance(other, (int, float)), "only supporting int/float powers for now"
+        out = Value(
+            self.data ** other,
+            f"{self.label}^({other})",
+            children=(self,),
+        )
+        def backward():
+            self.grad += out.grad * other * self.data ** (other -1)
+        out.backward = backward
+        return out
+
+    def __neg__(self):
+        return self * -1
+    
+    def __sub__(self, other):
+        return self + (-other)
 
     def run_full_backpropagation(self):
         # topological order all of the children in the graph
@@ -73,3 +111,7 @@ class Value:
 
     def __repr__(self):
         return f"{self.label} | data: {self.data:.4f} | grad: {self.grad:.4f}"
+    
+    @staticmethod
+    def __ensure_value(v):
+        return v if isinstance(v, Value) else Value(v, str(v))
