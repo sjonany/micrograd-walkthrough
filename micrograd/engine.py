@@ -3,7 +3,7 @@ import numpy as np
 class Value:
     """An expression DAG node that stores fwd pass value and its gradient"""
 
-    def __init__(self, data, label, children=()):
+    def __init__(self, data, label='', children=()):
         self.data = data
         self.label = label
         self.children = children
@@ -103,6 +103,10 @@ class Value:
                     build_topo(child)
                 topo.append(v)
         build_topo(self)
+
+        # Reset gradients before all the grad +='s
+        for v in topo:
+            v.grad = 0
 
         # go one variable at a time and apply the chain rule to get its gradient
         self.grad = 1
