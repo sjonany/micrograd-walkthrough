@@ -1,1 +1,2 @@
-Walkthrough karpathy micrograd, but first attempt w/ messy commits
+A walkthrough of Andrej Karpathy's [micrograd tutorial](https://www.youtube.com/watch?v=VMj-3S1tku0&ab_channel=AndrejKarpathy).
+Please see [this doc](https://docs.google.com/document/d/1RHtXTdusfhSRoYDJVX6hL37QFXEYIgkYdb-9QfkN0XI/edit) for accompanying notes.
